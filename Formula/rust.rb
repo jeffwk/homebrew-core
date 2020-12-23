@@ -42,8 +42,13 @@ class Rust < Formula
   resource "cargobootstrap" do
     on_macos do
       # From https://github.com/rust-lang/rust/blob/#{version}/src/stage0.txt
-      url "https://static.rust-lang.org/dist/2020-11-19/cargo-1.48.0-x86_64-apple-darwin.tar.gz"
-      sha256 "ce00d796cf5a9ac8d88d9df94c408e5d7ccd3541932a829eae833cc8e57efb15"
+      if Hardware::CPU.arch == :arm64
+        url "https://static.rust-lang.org/dist/2020-12-23/cargo-beta-aarch64-apple-darwin.tar.gz"
+        sha256 "efbc0e72533d4ca7def9a985feef4b3e43d24f1f6792815bdba9125af1f8ecdf"
+      else
+        url "https://static.rust-lang.org/dist/2020-11-19/cargo-1.48.0-x86_64-apple-darwin.tar.gz"
+        sha256 "ce00d796cf5a9ac8d88d9df94c408e5d7ccd3541932a829eae833cc8e57efb15"
+      end
     end
 
     on_linux do
@@ -78,17 +83,9 @@ class Rust < Formula
     else
       args << "--release-channel=stable"
     end
-    # Cross-compile arm64 with x86_64 bootstrap compiler.
-    if Hardware::CPU.arch == :arm64
-      args << "--build=x86_64-apple-darwin"
-      args << "--host=aarch64-apple-darwin"
-      args << "--target=aarch64-apple-darwin"
-      system "./configure", *args
-      system "arch", "-x86_64", "make"
-    else
-      system "./configure", *args
-      system "make"
-    end
+
+    system "./configure", *args
+    system "make"
     system "make", "install"
 
     resource("cargobootstrap").stage do
