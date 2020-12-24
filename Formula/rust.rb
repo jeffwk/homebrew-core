@@ -4,8 +4,8 @@ class Rust < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   stable do
-    url "https://static.rust-lang.org/dist/rustc-1.48.0-src.tar.gz"
-    sha256 "0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b"
+    url "https://static.rust-lang.org/dist/rustc-beta-src.tar.gz#1.49.0-beta"
+    sha256 "364fc8350d30f104595e458e51599369ffc5f796bb91b893372ba2631229963e"
 
     resource "cargo" do
       url "https://github.com/rust-lang/cargo.git",
@@ -84,6 +84,9 @@ class Rust < Formula
       args << "--release-channel=stable"
     end
 
+    # REMOVE THESE 2 LINES BEFORE MERGING
+    system "sed", "-i", "", "s/1.48.0/beta/g", "src/stage0.txt"
+    system "sed", "-i", "", "s/2020-11-19/2020-12-23/g", "src/stage0.txt"
     system "./configure", *args
     system "make"
     system "make", "install"
